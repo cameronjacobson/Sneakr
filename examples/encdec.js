@@ -30,19 +30,19 @@ key.e = tmp;
 
 function createKey(keySize,pubexp,privexp,mod) {
     if(keySize==128){
-        setMaxDigits(19);
+        rsa.setMaxDigits(19);
     }
     else if(keySize==256){
-        setMaxDigits(38);
+        rsa.setMaxDigits(38);
     }
     else if(keySize==512){
-        setMaxDigits(76);
+        rsa.setMaxDigits(76);
     }
     else if(keySize==1024){
-        setMaxDigits(130);
+        rsa.setMaxDigits(130);
     }
     else if(keySize==2048){
-        setMaxDigits(260);
+        rsa.setMaxDigits(260);
     }
     else {
         throw ('invalid keySize')

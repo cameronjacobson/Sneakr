@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+	<script type="text/javascript" src="/js/jsbn.js"></script>
+	<script type="text/javascript" src="/js/jsbn2.js"></script>
+	<script type="text/javascript" src="/js/prng4.js"></script>
+	<script type="text/javascript" src="/js/rng.js"></script>
+	<script type="text/javascript" src="/js/rsa.js"></script>
+	<script type="text/javascript" src="/js/rsa2.js"></script>
+	<script type="text/javascript" src="/js/RSA.js"></script>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+	<script language="JavaScript">
+
+	var keyblah;
+	var pubexponent = "65537";
+	$(function(){
+		var key;
+		var keylen = 512;
+		var encrypted;
+		$('#generate_key').on('click',function(){
+			console.log('GENERATING KEY');
+			key = new RSAKey();
+			key.generate(keylen,pubexponent);
+
+			keyblah = createKey(keylen, key.e.toString(16), key.d.toString(16), key.n.toString(16));
+
+		});
+		$('#decrypt').on('click',function(){
+			console.log('DECRYPTING: '+encrypted);
+			console.log(decrypt(encrypted));
+		});
+		$('#get_id').on('click',function(){
+			$.ajax({
+				type: 'POST',
+				url: 'http://127.0.0.1:9700',
+				data: {
+					pubexponent: key.e.toString(16),
+					modulus: key.n.toString(16),
+					keylen: keylen
+				},
+				dataType: 'jsonp',
+				success: function(data){
+					encrypted = data;
+					console.log('RECEIVED ENCRYPTED DATA FROM SERVER: "'+encrypted+'"');
+				},
+				error: function(xhr){
+					console.log('ERROR: '+xhr.responseText)
+				}
+			});
+		});
+	});
+
+	function encrypt(data){
+		return rsa.encryptedString(keyblah,data);
+	}
+
+	function decrypt(data){
+		return rsa.decryptedString(keyblah,data);
+	}
+
+	function createKey(keySize,pubexp,privexp,mod) {
+	    if(keySize==128){
+	        rsa.setMaxDigits(19);
+	    }
+	    else if(keySize==256){
+	        rsa.setMaxDigits(38);
+	    }
+	    else if(keySize==512){
+	        rsa.setMaxDigits(76);
+	    }
+	    else if(keySize==1024){
+	        rsa.setMaxDigits(130);
+	    }
+	    else if(keySize==2048){
+	        rsa.setMaxDigits(260);
+	    }
+	    else {
+	        throw ('invalid keySize')
+	    }
+
+	    return new rsa.RSAKeyPair(pubexp,privexp,mod);
+	}
+
+	</script>
+  </head>
+  <body>
+	<input type="button" value="generate key" id="generate_key" />
+	<input type="button" value="get id from server" id="get_id" />
+	<input type="button" value="decrypt" id="decrypt" />
+  </body>
+</html>
