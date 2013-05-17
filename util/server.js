@@ -34,19 +34,26 @@ http.createServer(function (req, res) {
   var body = '';
 
   req.on('end',function(){
+	try{
+		var url_parts = url.parse(req.url,true);
+		var query = url_parts.query;
 
-	var url_parts = url.parse(req.url,true);
-	var query = url_parts.query;
+		var keylen = query.keylen;
+		var modulus = query.modulus;
+		var pubexp = query.pubexponent;
+		var sessionid = query.sessionid;
+		var sessionname = query.sessionname;
+		var privexp = "";
 
-	var keylen = query.keylen;
-	var modulus = query.modulus;
-	var pubexp = query.pubexponent;
-	var privexp = "";
-	var key = createKey(keylen, pubexp, privexp, modulus);
-	var encrypted = rsa.encryptedString(key, "this is a test")
-
+		var key = createKey(keylen, pubexp, privexp, modulus);
+		sessionid = rsa.encryptedString(key, sessionid);
+		sessionname = rsa.encryptedString(key, sessionname);
+	}
+	catch(e){
+		console.log(e);
+	}
 	res.writeHead(200, {'Content-Type': 'text/plain'});
-	res.end(query.callback+'("'+encrypted+'")');
+	res.end(sessionname+':'+sessionid);
   });
 
 

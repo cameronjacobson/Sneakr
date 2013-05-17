@@ -8,11 +8,14 @@
 	<script type="text/javascript" src="/js/rsa.js"></script>
 	<script type="text/javascript" src="/js/rsa2.js"></script>
 	<script type="text/javascript" src="/js/RSA.js"></script>
+	<script type="text/javascript" src="/js/cookies.js"></script>
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
 	<script language="JavaScript">
 
 	var keyblah;
 	var pubexponent = "65537";
+	var sessionid;
+	var sessionname;
 	$(function(){
 		var key;
 		var keylen = 512;
@@ -27,18 +30,25 @@
 		});
 		$('#decrypt').on('click',function(){
 			console.log('DECRYPTING: '+encrypted);
-			console.log(decrypt(encrypted));
+			encrypted = encrypted.split(':');
+			sessionname = decrypt(encrypted[0]);
+			sessionid = decrypt(encrypted[1]);
+			console.log('SESSION NAME: '+sessionname);
+			console.log('SESSION ID  : '+sessionid);
+			docCookies.setItem(sessionname, sessionid, Infinity, '/', document.domain, false);
+			alert('logging into session: '+sessionid);
+			document.location = '/verify.php';
 		});
 		$('#get_id').on('click',function(){
 			$.ajax({
 				type: 'POST',
-				url: 'http://127.0.0.1:9700',
+				url: '/getId.php',
 				data: {
 					pubexponent: key.e.toString(16),
 					modulus: key.n.toString(16),
 					keylen: keylen
 				},
-				dataType: 'jsonp',
+				dataType: 'text',
 				success: function(data){
 					encrypted = data;
 					console.log('RECEIVED ENCRYPTED DATA FROM SERVER: "'+encrypted+'"');
