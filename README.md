@@ -1,6 +1,6 @@
 # Sneakr
 
-(experiment) passwordless-website concept [incomplete]
+(experiment) passwordless-website concept
 
 ## see examples in:
 
